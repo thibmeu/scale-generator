@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <title>TPE Benjamin</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap theme -->
+    <link href="index_files/bootstrap-theme.min.css" rel="stylesheet">
+
+  </head>
+
+  <body>
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Tpe Benjamin</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Tpe Benjamin</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Accueil</a></li>
+            <li><a href="about.html">A propos</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container theme-showcase" role="main">
+
+      <!-- Main jumbotron for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <h1>Ceci est notre tpe</h1>
+        <p>Une super description ici</p>
+      </div>
+
+		<table class="table font-14px">
+			<tbody>
+			<tr>
+				<div class="form-group">
+					<td class="right"><label class="col-md-4 control-label">Note</label></td>
+
+					<div class="col-md-6">
+						<td><select id="note"><option value="do">Do</option><option value="re">Re</option><option value="mi">Mi</option></option><option value="fa">Fa</option></option><option value="sol">Sol</option></option><option value="la">La</option></option><option value="si">Si</option></select></td>
+
+														</div>
+				</div>
+			</tr>
+			
+			<tr>
+				<div class="form-group">
+					<td class="right"><label class="col-md-4 control-label">Alteration</label></td>
+
+					<div class="col-md-6">
+						<td><select id="alteration"><option value="becard">-</option><option value="bemol">b</option><option value="diese">#</option></select></td>
+
+														</div>
+				</div>
+			</tr>
+			
+			<tr>
+				<div class="form-group">
+					<td class="right"><label class="col-md-4 control-label">Mode</label></td>
+
+					<div class="col-md-6">
+						<td><select id="mode"><option value="majeur">Majeur</option><option value="mineur">Mineur</option></select></td>
+
+														</div>
+				</div>
+			</tr>
+			
+			
+			<tr>
+				<div class="form-group">
+					<td class="right"><label class="col-md-4 control-label">Gamme</label></td>
+
+					<div class="col-md-6">
+						<td><select id="gamme"><option value="temperee">Temperee</option><option value="naturelle">Naturelle</option><option value="pythagore">Pythagore</option></select></td>
+
+														</div>
+				</div>
+			</tr>
+
+			<tr>
+				<td></td>
+				<td><button class="btn btn-primary" onclick="calculer()">Calculer</button></td>
+			</tr>
+			</tbody>
+		</table>
+	</form>
+
+      <div class="page-header">
+        <h1>Resultat</h1>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <table class="table">
+            <thead>
+              <tr id="notes">
+                <th>Do</th>
+                <th>Re</th>
+                <th>Mi</th>
+                <th>Fa</th>
+                <th>Sol</th>
+                <th>La</th>
+                <th>Si</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr id="frequences">
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    <script src="js/bootstrap.min.js"></script>
+  
+    <script>
+	var la3 = 440;
+	var nbNotes = 7;
+	var nomNotes = ['do', 're', 'mi', 'fa', 'sol', 'la', 'si'];
+	/*
+	var notesEnum = {
+		DO : 1,
+		RE : 3,
+		MI : 5,
+		FA : 6,
+		SOL : 8,
+		LA : 10,
+		SI : 12
+	};*/
+
+	var note;
+	var alteration;
+	var mode;
+	var gamme;
+	
+	window.onload = function() {
+		calculer();
+	}
+	
+	function calculer() {
+		note = document.getElementById("note");
+		note = note[note.selectedIndex].value
+		alteration = document.getElementById("alteration");
+		alteration = alteration[alteration.selectedIndex].value
+		mode = document.getElementById("mode");
+		mode = mode[mode.selectedIndex].value
+		gamme = document.getElementById("gamme");
+		gamme = gamme[gamme.selectedIndex].value
+		
+		notes = [];
+		switch (gamme) {
+			case "naturelle":
+				notes = naturelle();
+				break;
+			case "temperee":
+				notes = temperee();
+				break;
+			case "pythagore":
+				notes = pythagore();
+				break;
+		}
+		
+		th = '';
+		td = '';
+		for (n = 0; n < notes.length; n++) {
+			th += '<th>' + upperCaseFirst(nomNotes[(n + document.getElementById("note").selectedIndex)%nbNotes]) + '</th>'
+			td += '<td>' + notes[n].toFixed(0) + ' Hz</td>';
+		}
+		
+		document.getElementById("notes").innerHTML = th;
+        document.getElementById("frequences").innerHTML = td;
+        
+        
+    }
+    
+    function naturelle() {
+		var ton = 9/8;
+		var demiton = 25/24;
+		
+		if (mode === "majeur") {
+			return majeur(ton, demiton);
+		} else {
+			return mineur(ton, demiton);
+		}
+	}
+	
+	function temperee() {
+		var ton = Math.pow(2, 2/12);
+		var demiton = Math.pow(2, 1/12);
+		
+		if (mode === "majeur") {
+			return majeur(ton, demiton);
+		} else {
+			return mineur(ton, demiton);
+		}
+	}
+	
+	function pythagore() {
+		var ton = 9/8;
+		var demiton = Math.pow(2, 8)/Math.pow(3, 5);
+		
+		if (mode === "majeur") {
+			return majeur(ton, demiton);
+		} else {
+			return mineur(ton, demiton);
+		}
+	}
+	
+	function majeur(ton, demiton) {
+		var notes = [];
+		
+		notes[0] = premiere_frequence(demiton);
+		notes[1] = notes[0]*ton;
+		notes[2] = notes[1]*ton;
+		notes[3] = notes[2]*demiton;
+		notes[4] = notes[3]*ton;
+		notes[5] = notes[4]*ton;
+		notes[6] = notes[5]*demiton;
+		
+		return notes;
+	}
+	
+	function mineur(ton, demiton) {
+		var notes = [];
+		
+		notes[0] = premiere_frequence(demiton);
+		notes[1] = notes[0]*ton;
+		notes[2] = notes[1]*demiton;
+		notes[3] = notes[2]*ton;
+		notes[4] = notes[3]*ton;
+		notes[5] = notes[4]*demiton;
+		notes[6] = notes[5]*ton;
+		
+		return notes;
+	}
+    
+    function premiere_frequence(demiton) {
+		var numNote;
+		switch (note) {
+			case "do":
+				numNote = 1;
+				break;
+			case "re":
+				numNote = 3;
+				break;
+			case "mi":
+				numNote = 5;
+				break;
+			case "fa":
+				numNote = 6;
+				break;
+			case "sol":
+				numNote = 8;
+				break;
+			case "la":
+				numNote = 10;
+				break;
+			case "si":
+				numNote = 12;
+				break;
+		}
+		
+		switch (alteration) {
+			case "diese":
+				numNote++;
+				break;
+			case "bemol":
+				numNote--;
+				break;
+		}
+		
+		numNote -= 10;
+		
+		return la3*Math.pow(demiton, numNote);
+	}
+	
+	function upperCaseFirst(str){
+		return str.charAt(0).toUpperCase() + str.substring(1);
+	}
+	
+	</script>
+
+</body></html>
